@@ -22,7 +22,7 @@
 
 <h2>📜 項目簡介</h2>
 <p>
-    <img src="ClinicWebsite.png" alt="診所網站">
+    ![image](https://github.com/user-attachments/assets/b638a42b-fcc0-4bd4-b136-0b4413810032)
 </p>
 <p>
     愛心寶寶診所專案是一個專為診所設計的網站平台，旨在解決預約和管理上的低效率問題。透過系統化管理，診所能夠更有效地提升就診體驗，減少紙本作業，並支持無紙化及電子化管理的未來需求。
