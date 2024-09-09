@@ -71,8 +71,8 @@
 
 <p>💡 <strong>準備好使用這個診所系統了嗎？加入我們並提升診所管理效率！</strong></p>
 <p>
-    <a href="https://clinicwebsite.com/signup">立即體驗</a> | 
-    <a href="https://clinicwebsite.com/support">問題回報</a>
+    <a href="模擬診所專案/診所專案程式包">立即體驗</a> | 
+    <a href="[https://clinicwebsite.com/support](https://line.me/ti/p/YkTXGaB-bj)">問題回報</a>
 </p>
 
 </body>
