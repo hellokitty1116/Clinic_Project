@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>藥品管理</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .appointment-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .cancel-btn {
+            background-color: #f44336;
+        }
+        .cancel-btn:hover {
+            background-color: #d32f2f;
+        }
+        .edit-btn {
+            background-color: #4CAF50;
+        }
+        .edit-btn:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-right: 800px; /* 右邊間隔 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>修改欄位</h1>
+        
+        <form class="appointment-form" id="appointmentForm">
+            <div class="form-group">
+                <label for="medId">編號</label>
+                <input type="text" id="medId" name="medId">
+            </div>
+            <div class="form-group">
+                <label for="medName">藥名</label>
+                <input type="text" id="medName" name="medName">
+            </div>
+            <div class="form-group">
+                <label for="medType">類型</label>
+                <input type="text" id="medType" name="medType">
+            </div>
+            <div class="form-group">
+                <label for="indications">適應症</label>
+                <input type="text" id="indications" name="indications">
+            </div>
+            <div class="form-group">
+                <label for="quantity">數量</label>
+                <input type="text" id="quantity" name="quantity">
+            </div>
+        </form>
+        <button id="output">新增/更新</button>
+        
+        <button id="myButton" >返回</button><br>
+        <label style="color: green;" id="oresult"></label>
+        <hr/>
+        <h2>藥品總攬</h2>
+        <label for="mName">請輸入編號或藥名: </label>
+        <input type="text" id="mName" name="mName">
+        <button id="selectbtn">查詢</button>
+        <button id="selectall">顯示全部</button>
+        <label style="color:red" id="result"></label>
+        <table id="appointmentTable">
+            <thead>
+                <tr>
+                    <th>編號</th>
+                    <th>藥名</th>
+                    <th>類型</th>
+                    <th>適應症</th>
+                    <th>數量</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="mdtable"></tbody>
+        </table>
+    </div>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+
+        $(document).ready(function() {
+            $("#selectbtn").click(selectByInfo);
+            $("#selectall").click(showAll);
+            $("#output").click(createAndUpdate);
+            $('#myButton').attr('onclick', 'window.location.href="http://localhost:8080/spring/nurse/NurseController.html"');
+        });
+
+        function createAndUpdate() {
+            var datas = {
+                "medId": $("#medId").val(),
+                "medName": $("#medName").val(),
+                "medType": $("#medType").val(),
+                "indications": $("#indications").val(),
+                "quantity": $("#quantity").val()
+            };
+            $.ajax({
+                url: urlser + "medicine/createandupdate",
+                method: "POST",
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(datas),
+            }).done(function(result, status, xhr) {
+                if(xhr.status === 200) {
+                    $("#oresult").text("新增/更新成功");
+                    $("#mdtable").empty();
+                    var row = $("<tr></tr>");
+                    $("<td></td>").text(result.medId).appendTo(row);
+                    $("<td></td>").text(result.medName).appendTo(row);
+                    $("<td></td>").text(result.medType).appendTo(row);
+                    $("<td></td>").text(result.indications).appendTo(row);
+                    $("<td></td>").text(result.quantity).appendTo(row);
+                    $("<td></td>").html(
+                        '<button class="edit-btn" onclick="editMedicine(' + result.medId + ')">Edit</button>&nbsp' +
+                        '<button class="cancel-btn" onclick="cancelMedicine(' + result.medId + ')">Delete</button>'
+                    ).appendTo(row);
+                    $("#mdtable").append(row);
+                    $("#medId").val("");
+                    $("#medName").val("");
+                    $("#medType").val("");
+                    $("#indications").val("");
+                    $("#quantity").val("");
+                } else {
+                    $("#oresult").text("新增/更新失敗");
+                    $("#oresult").css("color", "red");
+                }
+            });
+        }
+
+        function showAll() {
+            $("#mdtable").empty();
+            $.ajax({
+                url: urlser + "medicine",
+                method: "GET",
+                dataType: "json",
+            }).done(function(result, status, xhr) {
+                if(xhr.status === 204) {
+                    $("#result").text("沒有藥物品項");
+                }else {
+                    $("#result").text("");
+                    $.each(result, function(i) {
+                        var row = $("<tr></tr>");
+                        $("<td></td>").text(this.medId).appendTo(row);
+                        $("<td></td>").text(this.medName).appendTo(row);
+                        $("<td></td>").text(this.medType).appendTo(row);
+                        $("<td></td>").text(this.indications).appendTo(row);
+                        $("<td></td>").text(this.quantity).appendTo(row);
+                        $("<td></td>").html(
+                            '<button class="edit-btn" onclick="editMedicine(' + this.medId + ')">修改</button>&nbsp' +
+                            '<button class="cancel-btn" onclick="cancelMedicine(' + this.medId + ')">刪除</button>'
+                        ).appendTo(row);
+                        $("#mdtable").append(row);
+                    });
+                }
+            });
+        }
+
+        function selectByInfo() {
+            $("#mdtable").empty();
+            $.ajax({
+                url: urlser + "medicine/select/" + $("#mName").val(),
+                method: "POST",
+                dataType: "json",
+            }).done(function(result, status, xhr) {
+                if(xhr.status === 204) {
+                    $("#result").text("沒有藥物品項");
+                }else {
+                    $("#result").text("");
+                    var row = $("<tr></tr>");
+                    $("<td></td>").text(result.medId).appendTo(row);
+                    $("<td></td>").text(result.medName).appendTo(row);
+                    $("<td></td>").text(result.medType).appendTo(row);
+                    $("<td></td>").text(result.indications).appendTo(row);
+                    $("<td></td>").text(result.quantity).appendTo(row);
+                    $("<td></td>").html(
+                        '<button class="edit-btn" onclick="editMedicine(' + result.medId + ')">Edit</button>&nbsp' +
+                        '<button class="cancel-btn" onclick="cancelMedicine(' + result.medId + ')">Delete</button>'
+                    ).appendTo(row);
+                    $("#mdtable").append(row);
+                }
+            });
+        }
+
+        function editMedicine(medId) {
+            $.ajax({
+                url: urlser + "medicine/select/" + medId,
+                method: "POST",
+                dataType: "json",
+            }).done(function(result, status, xhr) {
+                $("#medId").val(result.medId);
+                $("#medName").val(result.medName);
+                $("#medType").val(result.medType);
+                $("#indications").val(result.indications);
+                $("#quantity").val(result.quantity);
+            });
+        }
+
+        function cancelMedicine(medId) {
+            var ans = confirm("確認刪除嗎?");
+            if(ans) {
+                $.ajax({
+                    url: urlser + "medicine",
+                    method: "DELETE",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify({"medId": medId})
+                }).done(function(result) {
+                    if(result === "ok") {
+                        window.location.href = urlser + "nurse/NurseMedicinePage.html";
+                    } else {
+                        alert("刪除失敗");
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

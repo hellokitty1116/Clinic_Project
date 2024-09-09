@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>註冊病人</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #f0f8ff;
+        }
+        
+        .min-vh-80 {
+            min-height: 80vh; /* 設置最小高度為視口高度的 80% */
+        }
+
+        .btn-margin {
+            margin-left: 15px; /* 設置按鈕之間的間距 */
+        }
+
+        .form-container {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #343a40;
+            font-weight: bold;
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border-color: #ced4da;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+        .is-invalid {
+            border-color: #dc3545;
+        }
+
+        .is-valid {
+            border-color: #28a745;
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+        }
+
+        .valid-feedback {
+            display: block;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex flex-column justify-content-center align-items-center min-vh-80">
+        <h1 class="mb-4">加入本診所會員</h1>
+        <div class="form-container w-100" style="max-width: 400px;">
+            <form>
+                <div class="mb-3">
+                    <label for="patid" class="form-label">身份證號碼:</label>
+                    <input type="text" class="form-control" id="patid" name="patid" required>
+                    <div id="patid-feedback" class="invalid-feedback"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="patname" class="form-label">姓名:</label>
+                    <input type="text" class="form-control" id="patname" name="patname" required>
+                </div>
+                <div class="mb-3">
+                    <label for="patgender" class="form-label">性別:</label>
+                    <select class="form-control" id="patgender" name="patgender" required>
+                        <option value="" disabled selected>請選擇您的生理性別</option>
+                        <option value="male">生理男性</option>
+                        <option value="female">生理女性</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="patbirth" class="form-label">生日:</label>
+                    <input type="date" class="form-control" id="patbirth" name="patbirth" required>
+                </div>
+                <div class="mb-3">
+                    <label for="patphone" class="form-label">電話號碼:</label>
+                    <input type="text" class="form-control" id="patphone" name="patphone" required>
+                    <div id="patphone-feedback" class="invalid-feedback"></div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary" id="create">註冊</button>
+                    <a id="hrlogin" class="btn btn-secondary btn-margin">返回登入</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+
+        $(document).ready(function(){
+            $("#hrlogin").attr("href", urlser + "patient/LoginPatient.html");
+            $("#create").click(create);
+
+            $("#patid").on("input", function() {
+                const patId = $(this).val();
+                if (!isValidTWIDNumber(patId)) {
+                    $(this).addClass("is-invalid");
+                    $("#patid-feedback").text("請輸入正確的身分證號碼格式!");
+                } else {
+                    $(this).removeClass("is-invalid");
+                    $(this).addClass("is-valid");
+                    $("#patid-feedback").text("");
+                }
+            });
+
+            $("#patphone").on("input", function() {
+                const patPhone = $(this).val();
+                if (!isValidPhoneNumber(patPhone)) {
+                    $(this).addClass("is-invalid");
+                    $("#patphone-feedback").text("請輸入正確的電話號碼格式!");
+                } else {
+                    $(this).removeClass("is-invalid");
+                    $(this).addClass("is-valid");
+                    $("#patphone-feedback").text("");
+                }
+            });
+        });
+
+        function create(event) {
+            event.preventDefault(); // 防止表單默認提交
+
+            var patId = $("#patid").val().trim();
+            var patBirth = $("#patbirth").val().trim();
+            var patGender = $("#patgender").val().trim();
+            var patName = $("#patname").val().trim();
+            var patPhone = $("#patphone").val().trim();
+            
+            var datas = {
+                "patId": patId,
+                "patBirth": patBirth,
+                "patGender": patGender,
+                "patName": patName,
+                "patPhone": patPhone
+            };
+
+            if (!datas.patGender) {
+                alert("請選擇性別！");
+                return;
+            }
+
+            if (patId !== "" && patBirth !== "" && patGender !== "" && patName !== "" && patPhone !== "" &&
+                isValidTWIDNumber(patId) && isValidPhoneNumber(patPhone)) {    
+                $.ajax({
+                    url: urlser + "patient/create",
+                    method: "POST",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(datas)
+                }).done(function(res) {
+                    alert(res);
+                    window.location.href = urlser + "patient/LoginPatient.html";
+                }).fail(function(xhr, textStatus, errorThrown) {
+                    alert("註冊失敗：" + xhr.responseText);
+                });
+            } else {
+                alert("請確實填寫所有欄位並確保格式正確!");
+            }
+        }
+
+        function isValidTWIDNumber(id) {
+            // 身分證字號格式檢查
+            if (!/^[A-Z][12]\d{8}$/.test(id)) return false;
+
+            // 英文字母轉換為對應數字
+            const letterValue = "ABCDEFGHJKLMNPQRSTUVXYWZIO";
+            const n = letterValue.indexOf(id.charAt(0)) + 10;
+            const n1 = Math.floor(n / 10);
+            const n2 = n % 10;
+
+            // 驗證計算
+            let sum = n1 + n2 * 9;
+            for (let i = 1; i < 9; i++) {
+                sum += parseInt(id.charAt(i)) * (9 - i);
+            }
+            sum += parseInt(id.charAt(9));
+
+            return sum % 10 === 0;
+        }
+
+        function isValidPhoneNumber(phoneNumber) {
+            const regex = /^[0-9]{10}$/; // 假設電話號碼為10位數字
+            return regex.test(phoneNumber);
+        }
+    </script>
+</body>
+</html>

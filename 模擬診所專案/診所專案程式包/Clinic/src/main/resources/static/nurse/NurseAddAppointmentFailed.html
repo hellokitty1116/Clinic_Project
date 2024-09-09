@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>預約結果</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .result-message {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .failure {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .button-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn-back {
+            background-color: #FF0000;
+            color: white;
+        }
+        .btn-back:hover {
+            background-color: #a94442;
+        }
+        .btn-logout {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn-logout:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>預約結果</h1>
+        <div id="resultMessage" class="result-message failure">預約失敗！無此病人資料</div>
+        <div class="button-container">
+            <button class="btn btn-back" onclick="goBack()">返回主頁</button>
+        </div>
+    </div>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+
+        function goBack() {
+            window.location.href = urlser + "nurse/NurseController.html";
+        }
+    </script>
+</body>
+</html>

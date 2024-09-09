@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>醫生看診表</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .appointment-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .cancel-btn {
+            background-color: #4CAF50;
+        }
+        .cancel-btn:hover {
+            background-color: #45a049;
+        }
+        .btnbk {
+            display: grid;
+            justify-content: end;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2></h2>
+        <table id="appointmentTable">
+            <thead>
+                <tr>
+                    <th>病人姓名</th>
+                    <th>病人證號</th>
+                    <th>預約日期</th>
+                    <th>預約時間</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="apptable"></tbody>
+        </table>
+    </div>
+    <p></p>
+    <div class="btnbk">
+        <button id="back">返回</button>
+    </div>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+        var res = JSON.parse(sessionStorage.getItem("response"));
+        var stafName = res.stafName;
+
+        $(document).ready(function() {
+            $("h2").text(stafName + "___醫生看診表");
+            inputInfo(stafName);
+            $("#back").click(goBack);
+        });
+
+
+        function inputInfo(stafName) {
+            $("#apptable").empty();
+            var datas = {"stafName": stafName};
+            $.ajax({
+                url: urlser + "appointment/getbystafName",
+                method: "POST",
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(datas)
+            }).done(function(result) {
+                $.each(result, function(i) {
+                    var row = $("<tr></tr>");
+                    $("<td></td>").text(this.patName).appendTo(row);
+                    $("<td></td>").text(this.patId).appendTo(row);
+                    $("<td></td>").text(this.apDate).appendTo(row);
+                    $("<td></td>").text(this.apTime).appendTo(row);
+                    $("<td style='color:red'></td>").text("未看診").appendTo(row);
+                    $("<td></td>").html(
+                        '<button class="cancel-btn" onclick="treatment(' + this.apCode + ')">看診</button>'
+                    ).appendTo(row);
+                    $("#apptable").append(row);
+                });
+            });
+        }
+
+        function treatment(apCode) {
+            sessionStorage.setItem("apCode", apCode);
+            window.location.href = urlser + "doctor/DoctorTreatmentFirst.html";
+        }
+
+        function goBack() {
+            window.location.href = urlser + "doctor/DoctorController.html";
+        }
+        
+    </script>
+</body>
+</html>

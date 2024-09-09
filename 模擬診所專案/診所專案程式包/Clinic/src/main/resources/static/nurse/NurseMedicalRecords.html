@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>就醫紀錄</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .patient-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .view-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        .view-btn:hover {
+            background-color: #45a049;
+        }
+        .print-btn {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+            transition: background-color 0.3s;
+        }
+        .print-btn:hover {
+            background-color: #007B9A;
+        }
+        .btnbk {
+            display: grid;
+            justify-content: end;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>就醫歷史紀錄</h1>
+        <label for="patientID">請輸入病人證號: </label>
+        <input type="text" id="patientID" name="patientID">
+        <button id="selectbtn">查詢</button>
+        <label style="color:red" id="result"></label>
+        <p></p><br/>
+        <table>
+            <thead>
+                <tr>
+                    <th>就醫日期</th>
+                    <th>就醫時段</th>
+                    <th>看診醫師</th>
+                    <th>病人姓名</th>
+                    <th>處方籤</th>
+                </tr>
+            </thead>
+            <tbody id="medicalRecords"></tbody>
+        </table>
+    </div>
+    <p></p>
+    <div class="btnbk">
+        <button id="back">返回</button>
+    </div>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+
+        $(document).ready(function() {
+            $("#selectbtn").click(inputInfo);
+            $("#back").click(goBack);
+        });
+
+
+        function inputInfo() {
+            $("#medicalRecords").empty();
+            var datas = {"patId": $("#patientID").val()};
+            $.ajax({
+                url: urlser + "appointment/getbyid2",
+                method: "POST",
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(datas)
+            }).done(function(result, status, xhr) {
+                if(xhr.status === 204) {
+                    $("#result").text("沒有此病患資料");
+                }else {
+                    $("#result").text("");
+                    $.each(result, function(i) {
+                        var row = $("<tr></tr>");
+                        $("<td></td>").text(this.status).appendTo(row);
+                        $("<td></td>").text(this.apTime).appendTo(row);
+                        $("<td></td>").text(this.stafName).appendTo(row);
+                        $("<td></td>").text(this.patName).appendTo(row);
+                        $("<td></td>").html(
+                            '<button class="view-btn" onclick="viewPrescription(' + this.apCode + ')">查詢用藥</button>'
+                        ).appendTo(row);
+                        $("#medicalRecords").append(row);
+                    });
+                }
+            });
+        }
+
+        function viewPrescription(apCode) {
+            sessionStorage.setItem("appointmentCode", apCode);
+            window.location.href = urlser + "nurse/NurseMedicineLog.html";
+        }
+
+        function goBack() {
+            window.location.href = urlser + "nurse/NurseController.html";
+        }
+
+    </script>
+</body>
+</html>

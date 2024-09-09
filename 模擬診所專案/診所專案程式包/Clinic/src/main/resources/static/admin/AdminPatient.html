@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病人管理</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .appointment-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .cancel-btn {
+            background-color: #f44336;
+        }
+        .cancel-btn:hover {
+            background-color: #d32f2f;
+        }
+        .edit-btn {
+            background-color: #4CAF50;
+        }
+        .edit-btn:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-right: 300px; /* 右邊間隔 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>修改欄位</h1>
+        <div class="form-group">
+            <label for="patId">會員證號</label>
+            <input type="text" id="patId" name="patId" disabled>
+        </div>
+        <div class="form-group">
+            <label for="patName">姓名</label>
+            <input type="text" id="patName" name="patName">
+        </div>
+        <div class="form-group">
+            <label for="patGender">性別</label>
+            <select id="patGender" name="patGender">
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="patBirth">生日</label>
+            <input type="date" id="patBirth" name="patBirth">
+        </div>
+        <div class="form-group">
+            <label for="patPhone">電話</label>
+            <input type="text" id="patPhone" name="patPhone">
+        </div>
+        <p></p>
+        <button id="output">更新會員資料</button>
+        <label style="color: green;" id="result"></label> 
+        <button id="myButton" >返回</button>
+        <hr/>
+        <h2>會員總攬</h2>
+        <table id="patientTable">
+            <thead>
+                <tr>
+                    <th>病人證號</th>
+                    <th>姓名</th>
+                    <th>性別</th>
+                    <th>生日</th>
+                    <th>電話</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="patable"></tbody>
+        </table>
+    </div>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+
+        $(document).ready(function() {
+            showAll();
+            $("#output").click(createAndUpdate);
+            $('#myButton').attr('onclick', 'window.location.href="http://localhost:8080/spring/admin/AdminController.html"');
+        });
+
+        
+        function showAll() {
+            $("#patable").empty();
+            $.ajax({
+                url: urlser + "patient",
+                method: "GET",
+                dataType: "json",
+            }).done(function(result) {
+                $.each(result, function(i) {
+                    var row = $("<tr></tr>");
+                    $("<td></td>").text(this.patId).appendTo(row);
+                    $("<td></td>").text(this.patName).appendTo(row);
+                    $("<td></td>").text(this.patGender).appendTo(row);
+                    $("<td></td>").text(this.patBirth).appendTo(row);
+                    $("<td></td>").text(this.patPhone).appendTo(row);
+                    $("<td></td>").html(
+                        '<button class="edit-btn" onclick="editPatient(\'' + this.patId + '\')">修改</button>'
+                    ).appendTo(row);
+                    $("#patable").append(row);
+                });
+            });
+        }
+        
+        function editPatient(patId) {
+            $.ajax({
+                url: urlser + "patient/selectbyid/" + patId,
+                method: "POST",
+                dataType: "json",
+            }).done(function(result) {
+                $("#patId").val(result.patId);
+                $("#patName").val(result.patName);
+                $("#patGender").val(result.patGender);
+                $("#patBirth").val(result.patBirth);
+                $("#patPhone").val(result.patPhone);
+            });
+        }
+
+       /*function cancelPatient(patId) {
+            var ans = confirm("確認刪除嗎?");
+            if(ans) {
+                $.ajax({
+                    url: urlser + "patient",
+                    method: "DELETE",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify({"patId": patId})
+                }).done(function(result) {
+                    if(result === "ok") {
+                        showAll();
+                    } else {
+                        alert("刪除失敗");
+                    }
+                });
+            }
+        }*/
+
+        function createAndUpdate() {
+            var datas = {
+                "patId": $("#patId").val(),
+                "patName": $("#patName").val(),
+                "patGender": $("#patGender").val(),
+                "patBirth": $("#patBirth").val(),
+                "patPhone": $("#patPhone").val()
+            };
+            $.ajax({
+                url: urlser + "patient/createandupdate",
+                method: "POST",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(datas),
+            }).done(function(result, status, xhr) {
+                if(xhr.status === 200) {
+                    $("#result").text("新增/更新成功");
+                    showAll();
+                    $("#patId").val("");
+                    $("#patName").val("");
+                    $("#patGender").val("");
+                    $("#patBirth").val("");
+                    $("#patPhone").val("");
+                } else {
+                    $("#result").text("新增/更新失敗");
+                    $("#result").css("color", "red");
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

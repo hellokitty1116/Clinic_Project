@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>愛心寶寶診所</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">愛心寶寶 診所</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#team">團隊介紹</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#appointment">預約掛號</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#inquiry">查詢/取消掛號</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="memberCenterDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        會員中心
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="memberCenterDropdown">
+                        <a class="dropdown-item" href="http://localhost:8080/spring/patient/LoginPatient.html">會員登入</a>
+                        <a class="dropdown-item" href="http://localhost:8080/spring/patient/LoginAdmin.html">員工登入</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <section id="appointment" class="mt-5">
+            <h2 class="text-center mb-4">預約掛號</h2>
+            <p class="text-center">請使用以下按鈕進行掛號預約。</p>
+            <div class="text-center">
+                <button class="btn btn-primary">立即預約</button>
+            </div>
+        </section>
+
+        <section id="inquiry" class="mt-5">
+            <h2 class="text-center mb-4">查詢/取消掛號</h2>
+            <p class="text-center" href="http://localhost:8080/spring/patient/LoginPatient.html">您可以在這裡查詢或取消您的掛號預約。</p>
+            <div class="text-center">
+                <button class="btn btn-warning">查詢/取消掛號</button>
+            </div>
+        </section>
+
+        <section id="team" class="mt-5">
+            <h2 class="text-center mb-4">團隊介紹</h2>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <img src="/spring/images/doc1.png" alt="醫生1" class="doctor-img-wrapper" width="150">
+                    <h4>倉鼠醫生</h4>
+                    <p>專科醫師</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="/spring/images/doc3.png" alt="醫生2" class="doctor-img-wrapper" width="150">
+                    <h4>兔兔醫生</h4>
+                    <p>診所院長</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="/spring/images/doc2.png" alt="醫生3" class="doctor-img-wrapper" width="150">
+                    <h4>小貓醫生</h4>
+                    <p>專科醫師</p>
+                </div>
+            </div>
+        </section>
+        <!--
+        <section id="medicine" class="mt-5">
+            <h2 class="text-center mb-4">藥品介紹</h2>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <img src="medicine1.jpg" alt="藥品1" class="img-fluid mb-3">
+                    <h4>藥品名稱1</h4>
+                    <p>這是藥品1的簡單介紹。</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="medicine2.jpg" alt="藥品2" class="img-fluid mb-3">
+                    <h4>藥品名稱2</h4>
+                    <p>這是藥品2的簡單介紹。</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="medicine3.jpg" alt="藥品3" class="img-fluid mb-3">
+                    <h4>藥品名稱3</h4>
+                    <p>這是藥品3的簡單介紹。</p>
+                </div>
+            </div>
+        </section>
+        -->
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <section id="contact-us">
+            <h4>聯絡我們</h4>
+            <p>地址：台北市中山區某某路123號</p>
+            <p>電話：(02) 1234-5678</p>
+            <p>Email：contact@clinic.com</p>
+        </section>
+
+        <p>&copy; 2024 愛心寶寶診所. 版權所有.</p>
+    </footer>
+    <script>
+    $(document).ready(function() {
+    	$('.btn').attr('onclick', 'window.location.href="http://localhost:8080/spring/patient/LoginPatient.html"');
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員本月預約狀態列表</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-ongoing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-scheduled {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .pagination button:disabled {
+            background-color: #c0c0c0;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>會員本月預約狀態列表</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>病人姓名</th>
+                    <th>就診日期</th>
+                    <th>預約時段</th>
+                    <th>主治醫師</th>
+                    <th>狀態</th>
+                </tr>
+            </thead>
+            <tbody id="apptable">
+                <!-- 這裡將填充表格數據 -->
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        <button id="prevPage" disabled>上一頁</button>
+        <span id="pageInfo">第 1 頁</span>
+        <button id="nextPage">下一頁</button>
+    </div>
+    <script>
+        $(document).ready(function() {
+            const response = JSON.parse(sessionStorage.getItem("response"));
+            const patientID = response.patId;
+            let currentPage = 0;
+            const pageSize = 5; // 每頁顯示的項目數
+
+            function loadAppointments(page) {
+                $.ajax({
+                    url: `http://localhost:8080/spring/appointment/aphistory/${patientID}`,
+                    method: "GET",
+                    dataType: "json",
+                    data: {
+                        pageNo: page,
+                        pageSize: pageSize,
+                        sortBy: 'apDate'
+                    }
+                }).done(function(res) {
+                    $("#apptable").empty(); // 清空表格內容
+
+                    $.each(res, function(i, item) {
+                        var row = $("<tr></tr>");
+                        $("<td></td>").text(item.patName).appendTo(row);
+                        $("<td></td>").text(item.apDate).appendTo(row);
+                        $("<td></td>").text(item.apTime).appendTo(row);
+                        $("<td></td>").text(item.stafName).appendTo(row);
+
+                        // 創建狀態單元格
+                        var statusCell = $("<td></td>");
+                        var statusSpan = $("<span></span>").text(item.status);
+
+                        // 根據狀態值添加類
+                        if (item.status === "ap") {
+                        	 statusSpan.text("已預約");
+                            statusSpan.addClass('status status-scheduled');
+                        }else {
+                        	statusSpan.text("已完成");
+                            statusSpan.addClass('status status-completed'); // 預設樣式
+                        }
+
+                        statusCell.append(statusSpan);
+                        statusCell.appendTo(row);
+                        $("#apptable").append(row);
+                    });
+
+                    // 更新頁碼信息
+                    $("#pageInfo").text(`第 ${currentPage + 1} 頁`);
+                    $("#prevPage").prop('disabled', currentPage === 0);
+                    $("#nextPage").prop('disabled', res.length < pageSize); // 如果當前頁面項目數少於每頁大小，則禁用「下一頁」按鈕
+                });
+            }
+
+            // 初始加載
+            loadAppointments(currentPage);
+
+            // 點擊「上一頁」按鈕
+            $("#prevPage").click(function() {
+                if (currentPage > 0) {
+                    currentPage--;
+                    loadAppointments(currentPage);
+                }
+            });
+
+            // 點擊「下一頁」按鈕
+            $("#nextPage").click(function() {
+                currentPage++;
+                loadAppointments(currentPage);
+            });
+        });
+    </script>
+</body>
+</html>

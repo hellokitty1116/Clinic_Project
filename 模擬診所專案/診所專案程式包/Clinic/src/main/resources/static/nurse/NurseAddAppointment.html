@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>預約掛號</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .cancel-btn {
+            background-color: #f44336;
+        }
+        .cancel-btn:hover {
+            background-color: #d32f2f;
+        }
+        .btnbk {
+            display: grid;
+            justify-content: end;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>預約掛號</h1>
+        
+        <div class="form-group">
+            <label for="patientName">病人姓名</label>
+            <input type="text" id="patientName" name="patientName">
+        </div>
+        <p></p>
+        <div class="form-group">
+            <label for="patientID">病人證號</label>
+            <input type="text" id="patientID" name="patientID">
+        </div>
+        <p></p>
+        <div class="form-group">
+            <label for="department">醫生</label>
+            <select id="department" name="department"></select>
+        </div>
+        <p></p>
+        <div class="form-group">
+            <label for="appointmentDate">預約日期</label>
+            <input type="date" id="appointmentDate" name="appointmentDate">
+        </div>
+        <p></p>
+        <div class="form-group">
+            <label for="appointmentTime">預約時段</label>
+            <select id="appointmentTime" name="appointmentTime">
+                <option value="上午">上午</option>
+                <option value="下午">下午</option>
+                <option value="晚上">晚上</option>
+            </select>
+        </div>
+        <p></p>
+        <div class="form-group">
+            <button id="bt1">預約掛號</button>
+        </div>
+    </div>
+    <p></p>
+    <div class="btnbk">
+        <button id="back">返回</button>
+    </div>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+
+        $(document).ready(function() {
+            dateController();
+            getDoctors();
+            $("#bt1").click(addAp);
+            $("#back").click(goBack);
+        });
+
+
+        function dateController() {
+            var min = new Date();
+            min.setDate(min.getDate() + 1);
+            var today_min = min.toISOString().split('T')[0];
+            $("#appointmentDate").attr("min", today_min);
+
+            var max = new Date();
+            max.setDate(max.getDate() + 14);
+            var today_max = max.toISOString().split('T')[0];
+            $("#appointmentDate").attr("max", today_max);
+        }
+
+        function getDoctors() {
+            $.ajax({
+                url: urlser + "medicalstaff",
+                method: "GET",
+                dataType: "json"
+            }).done(function(res) {
+                $.each(res, function(i) {
+                    var dc = $("<option></option>").text(this.stafName).val(this.stafCode);
+                    $("#department").append(dc);
+                });
+            });
+        }
+
+        function addAp() {
+            var datas = {
+                "patient": $("#patientID").val(),
+                "medicalstaff": $("#department").val(),
+                "apDate": $("#appointmentDate").val(),
+                "apTime": $("#appointmentTime").val()
+            };
+            $.ajax({
+                url: urlser + "appointment/add",
+                method: "POST",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(datas)
+            }).done(function(res) {
+                if(res === "ok") {
+                    window.location.href = urlser + "nurse/NurseAddAppointmentOK.html";
+                } else {
+                    window.location.href = urlser + "nurse/NurseAddAppointmentFailed.html";
+                }
+                
+            });
+        }
+
+        function goBack() {
+            window.location.href = urlser + "nurse/NurseController.html";
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統管理員</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .greeting {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            height: calc(100vh - 100px);
+        }
+        .block {
+            width: 200px;
+            height: 200px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+        }
+        button {
+            padding: 6px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="greeting">
+        <span id="admin-name"></span>___管理員
+        <button id="logout">登出</button>
+    </div>
+    <div class="container">
+        <a id="item1">
+            <div class="block">
+                <div class="icon">💉</div>
+                <div class="label">病人管理</div>
+            </div>
+        </a>
+        <a id="item2">
+            <div class="block">
+                <div class="icon">🏥</div>
+                <div class="label">員工管理</div>
+            </div>
+        </a>
+    </div>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+
+        $(document).ready(function() {
+            $("#item1").attr("href", urlser + "admin/AdminPatient.html");
+            $("#item2").attr("href", urlser + "admin/AdminStaff.html");
+
+            var res = JSON.parse(sessionStorage.getItem("response"));
+            if(res == undefined) {
+                window.location.href = urlser + "nurse/ReturnLogin.html";
+            }
+
+            $("#admin-name").text(res.stafName);
+            $("#logout").click(outStaff);
+        });
+
+        function outStaff() {
+            sessionStorage.clear();
+            window.location.href = urlser + "patient/LoginAdmin.html";
+        }
+
+    </script>
+</body>
+</html>

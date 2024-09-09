@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員服務選擇</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+        }
+        .patient-id {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .patient-name {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .service-item {
+            background-color: #4CAF50;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .service-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .service-item h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .service-item p {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .logout-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>會員服務選擇</h1>
+        <div class="patient-id" id="patId"></div>
+        <div class="patient-name" id="patName"></div>
+        
+        <div class="service-grid">
+            <div class="service-item" onclick="goAppointment()">
+                <h2>預約/取消掛號</h2>
+                <p>安排您的診療時間</p>
+            </div>
+            <div class="service-item" onclick="selectAppointment()">
+                <h2>查詢預約</h2>
+                <p>檢視您的預約狀態</p>
+            </div>
+            <div class="service-item" onclick="medicalRecords()">
+                <h2>會診紀錄</h2>
+                <p>查看您的診療歷史記錄</p>
+            </div>
+        </div>
+    </div>
+    <button class="logout-btn" onclick="clearSession()">登出</button>
+
+    <script>
+        var urlser = "http://localhost:8080/spring/";
+
+        $(document).ready(function() {
+            var res = JSON.parse(sessionStorage.getItem("response"));
+            var id = "身份證: " + res.patId;
+            var name = "姓名: " + res.patName;
+            $("#patId").text(id);
+            $("#patName").text(name);
+        });
+
+        function clearSession() {
+        	if(confirm('確定要登出嗎?')){
+        		alert('您已成功登出');
+        		 sessionStorage.clear();
+                 window.location.href = urlser + "patient/LoginPatient.html";
+        	}
+           
+        }
+
+        function goAppointment() {
+            window.location.href = urlser + "Appointment/addAppointment.html";
+        }
+
+        function selectAppointment() {
+            window.location.href = urlser + "Appointment/Appointment.html";
+        }
+
+        function medicalRecords() {
+            window.location.href = urlser + "Appointment/MedicalRecords.html";
+        }
+        
+    </script>
+</body>
+</html>
